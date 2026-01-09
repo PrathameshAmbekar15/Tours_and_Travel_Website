@@ -1,16 +1,32 @@
-document.getElementById("contactForm").addEventListener("submit", function(event) {
-    event.preventDefault();
-    const username = document.getElementById("mame").value;
-    const password = document.getElementById("email").value;
-  
-    // Simple validation
-    if (username.trim() === '' || password.trim() === '') {
-      alert("Please enter both username and password.");
-      return;
-    }
-  
-    // Add further validation or authentication logic here
-    
-    // If validation is successful, you can redirect the user or perform other actions
-    alert("Message received successful!");
-  });
+document.querySelector('.right-side form').addEventListener('submit', function (event) {
+  event.preventDefault();
+  const name = this.querySelector('input[name="name"]').value;
+  const email = this.querySelector('input[name="email"]').value;
+  const message = this.querySelector('input[name="message"]').value;
+
+  if (!name || !email || !message) {
+    alert("Please fill in all fields.");
+    return;
+  }
+
+  fetch('/api/contact', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ name, email, message })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        alert("Error: " + data.error);
+      } else {
+        alert("Message sent successfully!");
+        this.reset();
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("An error occurred while sending the message.");
+    });
+});
